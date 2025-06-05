@@ -1,5 +1,5 @@
 from pydantic import EmailStr
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -24,9 +24,10 @@ class Settings(BaseSettings):
     imap_user: str | None = None
     imap_password: str | None = None
 
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+    )
 
 
 settings = Settings()

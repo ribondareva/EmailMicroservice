@@ -1,6 +1,6 @@
 import asyncio
 from sqlalchemy.ext.asyncio import AsyncSession
-from datetime import datetime
+from datetime import datetime, UTC
 from sqlalchemy.future import select
 from email.mime.text import MIMEText
 from app.models.email import Email
@@ -23,7 +23,7 @@ class EmailService:
             subject=payload.subject,
             body=payload.body,
             is_sent=True,
-            sent_at=datetime.utcnow(),
+            sent_at=datetime.now(UTC),
         )
         self.db.add(email)
 
@@ -57,6 +57,9 @@ class EmailService:
 
     def _send_email_sync(self, payload: EmailSendRequest):
         import smtplib
+        if not settings.smtp_host or not settings.smtp_port:
+            print("SMTP settings not configured, skipping sending email", flush=True)
+            return
         msg = MIMEText(payload.body, "html" if payload.is_html else "plain")
         msg["Subject"] = payload.subject
         msg["From"] = settings.sender_email

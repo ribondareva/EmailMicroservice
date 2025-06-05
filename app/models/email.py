@@ -1,6 +1,6 @@
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text
-from sqlalchemy.ext.declarative import declarative_base
-from datetime import datetime
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text, TIMESTAMP
+from sqlalchemy.orm import declarative_base
+from datetime import datetime, timezone
 
 Base = declarative_base()
 
@@ -15,4 +15,4 @@ class Email(Base):
     subject = Column(String)
     body = Column(String)
     is_sent = Column(Boolean, default=True)
-    sent_at = Column(DateTime, default=datetime.utcnow)
+    sent_at = Column(TIMESTAMP(timezone=True), nullable=False)

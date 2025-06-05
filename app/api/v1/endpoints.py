@@ -48,6 +48,10 @@ async def email_stats(
 ):
     try:
         service = StatsService(db)
-        return await service.get_stats(from_date, to_date)
+        stats = await service.get_stats(from_date, to_date)
+        print("Stats result:", stats)
+        return stats
+    except ValueError as ve:
+        raise HTTPException(status_code=422, detail=str(ve))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
