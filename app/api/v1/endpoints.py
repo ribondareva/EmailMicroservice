@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+import asyncio
+
+from fastapi import APIRouter, Depends, HTTPException, Query, BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime
 from typing import List, Optional
@@ -7,6 +9,7 @@ from app.db import get_db
 from app.schemas.email import EmailSendRequest, EmailResponse, EmailStatsResponse
 from app.services.email_service import EmailService
 from app.services.stats_service import StatsService
+from services.imap_service import IMAPService
 
 router = APIRouter(tags=["Emails"])
 
@@ -23,6 +26,7 @@ async def send_email(payload: EmailSendRequest, db: AsyncSession = Depends(get_d
 
 @router.get("/", response_model=List[EmailResponse])
 async def list_emails(
+        background_tasks: BackgroundTasks,
         from_date: Optional[datetime] = Query(None),
         to_date: Optional[datetime] = Query(None),
         sender: Optional[str] = None,
@@ -30,6 +34,9 @@ async def list_emails(
         subject_contains: Optional[str] = None,
         db: AsyncSession = Depends(get_db)
 ):
+    imap_service = IMAPService(db)
+
+    background_tasks.add_task(imap_service.fetch_emails)
     try:
         service = EmailService(db)
         emails = await service.list_emails(

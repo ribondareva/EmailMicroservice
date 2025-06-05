@@ -1,5 +1,7 @@
 venv/
 .env
+.env.dev
+.env.prod
 .idea/
 
 # Byte-compiled / optimized / DLL files
